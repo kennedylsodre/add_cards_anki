@@ -1,0 +1,16 @@
+{
+  "action": "addNote",
+  "version": 6,
+  "params": {
+    "note": {
+      "deckName": "MeuDeck",
+      "modelName": "Basic",
+      "fields": {
+        "Front": "",
+        "Back": ""
+      },
+      "audio": [],
+      "tags": []
+    }
+  }
+}
