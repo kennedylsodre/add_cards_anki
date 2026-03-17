@@ -1,6 +1,6 @@
 {
     "text_path": "../sentences.txt",
     "audio_path": "../data/",
-    "deck_name": "deck",
+    "deck_name": "Mineração",
     "conda_env": "anki"
 }

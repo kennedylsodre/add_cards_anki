@@ -9,10 +9,12 @@ import io
 from PIL import Image 
 import dotenv
 import time
+import uuid
+import replicate
 
 class AddCardAnki:
 
-    dotenv.load_dotenv()
+    dotenv.load_dotenv('../.env')
 
     def __init__(self,text_path,audio_path,deck_name,payload_path): 
         self.anki_url = "http://localhost:8765" 
@@ -21,6 +23,9 @@ class AddCardAnki:
         self.payload_path = 'payload_anki.json'
         self.deck_name = deck_name
         self.payload_path = payload_path 
+        self.token_replicate = os.getenv("ENGLISH_GENERATE") 
+        os.environ['REPLICATE_API_TOKEN'] = self.token_replicate
+        
 
     def read_file(self):
 
@@ -33,12 +38,15 @@ class AddCardAnki:
         dict_decks = {}
 
         for card, line in enumerate(self.file.splitlines()):
+            
+            id_img = uuid.uuid4()
             front = line.split(';')[0]
-            back = f'{line.split(";")[1]}<br><img src="card_{card}.png">'
+            back = f'{line.split(";")[1]}<br><img src="card_{card}_{id_img}.png">'
             path_audio = f'{self.path_folder_audio}/card_{card}.mp3'
-            path_img = f'{self.path_folder_audio}/card_{card}.png'
-            img_prompt = line.split(";")[1]
-            list_card = [front,back,path_audio,path_img,img_prompt]
+            path_img = f'{self.path_folder_audio}/card_{card}_{id_img}.png'
+            img_prompt = line.split(";")[2]
+            audio_prompt = line.split(";")[3]
+            list_card = [front,back,path_audio,path_img,img_prompt,audio_prompt]
             dict_decks[card] = list_card
         
         self.dict_decks = dict_decks
@@ -50,35 +58,29 @@ class AddCardAnki:
 
         return tts.save(path_audio)
     
-    def generate_image(self, sentence, path_image, tentativas=3):
-        """
-        Gera uma imagem a partir de uma frase (sentence) usando a API do Pollinations
-        e salva o resultado no caminho path_image.
-        """
+
+
+    def generate_image(self, sentence, path_image, tentativas=50):
+
+        print(f'Gerando imagem para {sentence}')    
         prompt = sentence.replace(" ", "%20")
-        url = f"https://image.pollinations.ai/prompt/{prompt}"
-    
-        for i in range(tentativas):
-            try:
-                print(f"🔹 Tentando gerar imagem ({i+1}/{tentativas}) para: {sentence}")
-                response = requests.get(url, timeout=60)
-                response.raise_for_status()
-    
-                # Salva o conteúdo da imagem no disco
-                with open(path_image, "wb") as f:
-                    f.write(response.content)
-    
-                print(f"✅ Imagem salva em: {path_image}")
-                return path_image  # retorna o caminho do arquivo salvo
-    
-            except Exception as e:
-                print(f"⚠️ Erro ao gerar imagem ({i+1}/{tentativas}): {e}")
-                if i < tentativas - 1:
-                    print("⏳ Aguardando 5s e tentando de novo...")
-                    time.sleep(5)
-                else:
-                    print(f"❌ Falha ao gerar imagem para: {sentence}")
-                    return None
+
+        output = replicate.run(
+                    "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
+            input={"prompt": prompt}
+        )
+        image_url = output[0]
+
+        img = requests.get(image_url).content
+
+        print(f'Imagem geranda, salvando imagaem em {path_image}')
+
+        with open(path_image, "wb") as f:
+            f.write(img)
+        
+        return path_image
+
+        print("Imagem salva!")  
 
 
     def convert_base64(self,type_file,path,sentence): 
@@ -103,13 +105,13 @@ class AddCardAnki:
 
             return image_base64
         
-    def post_image(self, img,card):
+    def post_image(self, img,path_img):
 
         return requests.post(self.anki_url, json={
                 "action": "storeMediaFile",
                 "version": 6,
                 "params": {
-                    "filename": f"card_{card}.png",
+                    "filename":path_img,
                     "data": img
                     }
                 }
@@ -125,17 +127,17 @@ class AddCardAnki:
         path_audio = self.dict_decks[card][2]
         path_image = self.dict_decks[card][3] 
         prompt_image = self.dict_decks[card][4] 
-
+        promppt_audio = self.dict_decks[card][5] 
 
         img_base_64 = self.convert_base64('img',path_image,prompt_image)
 
-        self.post_image(img_base_64,card)
+        self.post_image(img_base_64, path_image)
 
         payload['params']['note']['deckName'] = self.deck_name
         payload["params"]["note"]["fields"]["Front"] = front
         payload["params"]["note"]["fields"]["Back"] = back
 
-        audio_base64 = self.convert_base64('audio',path_audio,front)   
+        audio_base64 = self.convert_base64('audio',path_audio,promppt_audio)   
         
 
         payload["params"]["note"]["audio"] = [

@@ -1,0 +1,18 @@
+For the TARGET WORD: “_WORD_”, create exactly 5 English sentences.
+
+Follow all rules:
+
+1) The TARGET WORD must be the only challenging word.
+2) All other words must be extremely common.
+3) 10–16 words per sentence.
+4) Sentences must be natural, adult, and easy for a B1/B2 learner.
+5) Use realistic, situational scenes that could be visualized.
+6) Create 5 sentences with increasing emotional depth, but NEVER repeat the same structure.
+7) Do NOT use clichés like “deep down”, “in my heart”, or repeated introspection patterns.
+8) Emotional depth must come from the situation, not from fancy wording.
+9) Output format:
+Sentence 1: <sentence>
+Tradução: <Portuguese translation>
+Sentence 2: <sentence>
+Tradução: <Portuguese translation>
+…
