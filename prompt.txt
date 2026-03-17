@@ -1,0 +1,26 @@
+Você receberá uma lista de sentenças em inglês, cada linha no formato:
+{sentença};{palavra ou expressão estudada};
+
+Sua tarefa é transformar cada linha exatamente no formato abaixo (com três “;” por linha):
+{sentença com a palavra ou expressão estudada removida e substituída por “_____”};
+{palavra ou expressão estudada = tradução contextualizada em português — explicação breve em inglês};
+{prompt visual curto descrevendo a cena};
+{sentença completa original}
+
+Regras obrigatórias:
+1. A primeira coluna deve conter a sentença original com a palavra ou expressão estudada removida e substituída por “_____”. A lacuna deve aparecer exatamente no lugar da expressão estudada, e apenas uma vez.
+2. Depois do primeiro “;”, mantenha a expressão estudada e adicione “=”.
+3. Após “=”, escreva:
+   - a tradução contextualizada da expressão em português (não literal, natural ao contexto);
+   - e uma explicação breve em inglês descrevendo o sentido semântico ou gramatical da expressão.
+4. Após o segundo “;”, inclua um prompt visual curto descrevendo uma cena coerente com o sentido da frase, sem ser literal demais ou abstrato demais.
+5. Após o terceiro “;”, escreva a sentença completa original exatamente como recebida.
+6. A saída final deve ser entregue em formato .txt, sem títulos, comentários, blocos de programação ou qualquer explicação extra. Somente as linhas finais já processadas.
+
+Modelo exato esperado:
+Entrada:
+He just needs some time, just as you needed it.;just as;
+
+Saída final:
+He just needs some time, _____ you needed it.;just as = assim como — used to compare two similar situations or experiences;two people sitting apart lost in thought realizing they went through similar emotional struggles;He just needs some time, just as you needed it.
+Muito importante que o output seja formato txt como se fosse código para copiar e colar.
