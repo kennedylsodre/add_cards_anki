@@ -19,12 +19,18 @@ def main(
     add.read_file() 
     add.generate_json_deck()
 
-    for key in add.dict_decks.keys():
+    if add.file: 
+
+        for key in add.dict_decks.keys():
+            
+            add.fill_payload(card=key)
+            #print(add.payload)
+            add.add_card(add.payload)
+            print(f'Card {key} adicionado com suceso')
         
-        add.fill_payload(card=key)
-        #print(add.payload)
-        add.add_card(add.payload)
-        print(f'Card {key} adicionado com suceso')
+    print('Desuspendendo cards')
+
+    add.unsuspend_cards()
 
 def get_args_from_json(config_path):
     with open(config_path, 'r', encoding='utf-8') as f:
