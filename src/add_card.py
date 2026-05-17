@@ -155,3 +155,45 @@ class AddCardAnki:
 
         response = requests.post(self.anki_url,data = json.dumps(payload))
         print(response.json())
+
+    def unsuspend_cards(self):
+        payload = {
+            "action": "findCards",
+            "version": 6,
+            "params": {
+                "query": "is:suspended"
+            }
+        }
+
+        response_unsespended = requests.post(
+            self.anki_url,
+            data=json.dumps(payload)
+        ).json() 
+
+        cards = response_unsespended.get('result', [])
+
+        if len(cards) < 4:
+            print("Nenhum card suspenso suficiente encontrado.")
+            return
+
+        cards = cards[:4]
+
+        payload = {
+            "action": "unsuspend",
+            "version": 6,
+            "params": {
+                "cards": cards
+            }
+        }
+
+        response_unsuspended = requests.post(
+            self.anki_url,
+            data=json.dumps(payload)
+        ).json()
+
+        print(response_unsuspended)
+
+
+
+
+        
